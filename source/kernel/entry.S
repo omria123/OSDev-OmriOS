@@ -18,7 +18,7 @@ stack_top:
 
 
 section .text
-global _start:function
+global _start:function (_start.END - _start)
 ;The bootloader should load us into this location with the following settings:
 ; 1. 32-bit protected mode.
 ; 2. Paging is off.
@@ -28,3 +28,13 @@ global _start:function
 
 _start:
     mov esp, stack_top
+    ; Good place for assembly initialization
+    call kernel_main
+
+; Lock the computer
+    cli
+.HLT:
+    hlt
+    jmp .HLT
+.END:
+kernel_main:
