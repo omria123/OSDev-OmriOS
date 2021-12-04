@@ -5,9 +5,9 @@
 #ifndef OSDEV_STRING_H
 #define OSDEV_STRING_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "stdbool.h"
+#include "stddef.h"
+#include "stdint.h"
 
 
 

@@ -17,6 +17,7 @@ set(CMAKE_VERBOSE_MAKEFILE FALSE)
 set(OS_NAME OmriOS)
 
 # Include subdirectories
+include_directories(BEFORE include)
 add_subdirectory(source)
 
 

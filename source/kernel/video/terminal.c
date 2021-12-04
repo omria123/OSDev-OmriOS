@@ -1,13 +1,14 @@
 //
 // Created by omri on 01/12/2021.
 //
-#include "terminal.h"
+#include "kernel/video/terminal.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include "string.h"
+#include "stdlib/string.h"
+#include "kernel/video/pixel.h"
 
 struct {
     size_t row;
@@ -18,16 +19,14 @@ struct {
 } g_terminal_state = {0};
 
 
+
+
+
+
 error_t terminal_putchar(char c) {
     error_t err = SUCCESS;
     CHECK_CODE(g_terminal_state.is_initalized, ERROR_UNINITIALIZED);
 
-    terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-    if (++g_terminal_state.colum == VGA_WIDTH) {
-        g_terminal_state.colum = 0;
-        if (++g_terminal_state.row == VGA_HEIGHT)
-            g_terminal_state.row = 0;
-    }
 cleanup:
     return err;
 }
@@ -48,6 +47,15 @@ error_t terminal_write_cstring(const char *string) {
     CHECK_CODE(g_terminal_state.is_initalized, ERROR_UNINITIALIZED);
     CHECK(string);
     CHECK_AND_RETHROW(terminal_write(string, strlen(string)));
+cleanup:
+    return err;
+}
+
+error_t terminal_set_pos(const size_t row, const size_t col) {
+    error_t err = SUCCESS;
+    CHECK(g_terminal_state.is_initalized);
+    g_terminal_state.row = row;
+    g_terminal_state.colum = col;
 cleanup:
     return err;
 }

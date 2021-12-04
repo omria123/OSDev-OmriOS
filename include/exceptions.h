@@ -24,6 +24,9 @@ enum error {
 
 #define CHECK(expr) CHECK_CODE(expr, ERROR_INVALID)
 
+#define IS_SUCCESS(expr) ((expr) == SUCCESS)
+#define IS_FAILED(expr) (!IS_SUCCESS(expr))
+
 
 
 

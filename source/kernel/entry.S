@@ -3,6 +3,8 @@ MEMINFO equ (1<<1)
 KERNEL_ELF_FLAGS equ (ALIGNMENT | MEMINFO)
 MAGIC equ 0x1BADB002
 CHECKSUM equ -(MAGIC) + (KERNEL_ELF_FLAGS)
+MULTIBOOT2_HEADER_MAGIC equ
+GRUB_MULTIBOOT_ARCHITECTURE_I386 equ
 
 ; Multiboot header containing the magic, flags and checksum.
 section .multiboot align=4
@@ -25,10 +27,27 @@ global _start:function (_start.END - _start)
 ; 3. Interrupts are disabled.
 ; 4. Processor state is described as the multiboot standard defines.
 ; 5. Floating point instruction and extended IS are not initalized.
-
+; Good place for assembly initialization
+start:
 _start:
+    jmp multiboot_entry
+    align 8
+multiboot_header:
+    dd MULTIBOOT2_HEADER_MAGIC
+    dd GRUB_MULTIBOOT_ARCHITECTURE_I386
+    dd multiboot_header_end - multiboot_header
+    dd -(MULTIBOOT2_HEADER_MAGIC + GRUB_MULTIBOOT_ARCHITECTURE_I386 + (multiboot_header_end - multiboot_header))
+
+
+multiboot_entry:
     mov esp, stack_top
-    ; Good place for assembly initialization
+    xor edx, edx
+    push edx
+    popf
+
+
+    push ebx
+    push eax
     call kernel_main
 
 ; Lock the computer
