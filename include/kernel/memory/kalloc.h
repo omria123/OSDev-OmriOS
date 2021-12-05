@@ -6,12 +6,9 @@
 #include "exceptions.h"
 
 
+//error_t kalloc(size_t);
 
-
-error_t kalloc(size_t);
-
-error_t memory_initialize(size_t);
-
+//error_t memory_initialize(size_t);
 
 #endif //OSDEV_KALLOC_H
 

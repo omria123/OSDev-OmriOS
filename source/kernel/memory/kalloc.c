@@ -4,7 +4,7 @@
 
 #include "kernel/memory/kalloc.h"
 
-
+/*
 error_t kalloc() {
     error_t err = SUCCESS;
 
@@ -18,4 +18,4 @@ error_t memory_init() {
 
 cleanup:
     return err;
-}
+}*/

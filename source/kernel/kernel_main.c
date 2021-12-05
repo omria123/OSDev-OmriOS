@@ -1,17 +1,24 @@
-#include "kernel/video/pixel.h"
-#include "kernel/video/terminal.h"
+#include <stdint.h>
 
-static error_t initalize_modules() {
+#include "kernel/video/screen.h"
+#include "kernel/video/terminal.h"
+#include "kernel/multiboot2.h"
+
+
+static error_t initalize_modules(uint32_t multiboot_info) {
     error_t err = SUCCESS;
-    CHECK_AND_RETHROW(pixel_initalize());
-    CHECK_AND_RETHROW(terminal_initalize());
+    CHECK_AND_RETHROW(screen_initalize(multiboot_info));
+    CHECK_AND_RETHROW(terminal_initalize(multiboot_info));
 cleanup:
     return err;
 }
 
 
-void kernel_main(void) {
-    if (IS_FAILED(initalize_modules())) {
+void kernel_main(uint32_t magic, uint32_t multiboot_info) {
+    if (magic != MULTIBOOT2_HEADER_MAGIC) {
+        return;
+    }
+    if (IS_FAILED(initalize_modules(multiboot_info))) {
         return;
     }
 
