@@ -7,13 +7,12 @@ add_compile_options(
 )
 
 
-set(KERNEL_ENTRY_SOURCE entry.S)
-set(KERNEL_SOURCES kernel_main.c video/terminal.c ../stdlib/string.c video/screen.c memory/kalloc.c multiboot_utils.c)
+set(KERNEL_ENTRY_SOURCE boot/entry.S)
+set(KERNEL_SOURCES boot/kernel_main.c video/terminal.c ../stdlib/string.c video/screen.c memory/kalloc.c boot/multiboot_utils.c)
 set(KERNEL_COMPILE_FLAGS -ffreestanding -O2 -m32)
 set(KERNEL_LINK_FLAGS -nostdlib -m32)
 
-set_source_files_properties(entry.S PROPERTIES LANGUAGE ASM_NASM)
-set(CMAKE_ASM_NASM_OBJECT_FORMAT elf32)
+set_source_files_properties(boot/entry.S PROPERTIES LANGUAGE ASM_NASM)
 
 add_library(kernel_entry OBJECT ${KERNEL_ENTRY_SOURCE})
 set_target_properties(kernel_entry PROPERTIES NASM_OBJ_FORMAT elf32)

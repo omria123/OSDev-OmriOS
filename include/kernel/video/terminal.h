@@ -3,7 +3,7 @@
 //
 
 #ifndef OSDEV_TERMINAL_H
-#include <exceptions.h>
+#include <kernel/exceptions.h>
 
 error_t terminal_initalize();
 

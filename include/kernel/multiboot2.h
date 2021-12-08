@@ -375,7 +375,7 @@ struct multiboot_tag_load_base_addr {
 };
 
 #endif /*  ! ASM_FILE */
+struct multiboot_tag* multiboot_find_tag(multiboot_uint32_t mbi, multiboot_uint32_t type);
 
-struct multiboot_tag* multiboot_find_tag(multiboot_uint32_t mbi, multiboot_uint32_t type)
 
 #endif //OSDEV_MULTIBOOT2_H

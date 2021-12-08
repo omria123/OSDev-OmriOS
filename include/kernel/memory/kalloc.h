@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "exceptions.h"
+#include "kernel/exceptions.h"
 
 
 //error_t kalloc(size_t);
