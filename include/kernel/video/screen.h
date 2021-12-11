@@ -1,7 +1,3 @@
-//
-// Created by omri on 04/12/2021.
-//
-
 #ifndef OSDEV_SCREEN_H
 #define OSDEV_SCREEN_H
 
@@ -10,7 +6,6 @@
 #include <stdbool.h>
 
 #include "kernel/exceptions.h"
-#include "vga.h"
 
 enum video_mode {
     IND = 0,
@@ -18,6 +13,10 @@ enum video_mode {
     EGA = 2,
 };
 
+typedef struct {
+    uint8_t width;
+    uint8_t height;
+} char_settings_t;
 
 typedef struct {
     size_t width;

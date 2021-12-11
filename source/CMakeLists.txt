@@ -10,6 +10,10 @@ add_subdirectory(bootloader)
 
 set(OS_IMG ${CMAKE_BINARY_DIR}/${OS_NAME}.img)
 
+
+
+add_subdirectory(stdlib)
+
 add_custom_command(
         OUTPUT
             ${OS_IMG}

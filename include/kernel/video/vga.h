@@ -1,9 +1,6 @@
-//
-// Created by omri on 07/12/2021.
-//
-
 #ifndef OSDEV_VGA_H
 #define OSDEV_VGA_H
+#include "screen.h"
 
 enum vga_color {
     VGA_COLOR_BLACK = 0,
@@ -32,5 +29,8 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color)
 {
     return (uint16_t) uc | (uint16_t) color << 8;
 }
+error_t vga_putchar(uint32_t row, uint32_t col, char c, uint8_t color);
+
+extern char_settings_t vga_char_settings;
 
 #endif //OSDEV_VGA_H
