@@ -37,4 +37,6 @@ error_t screen_mode(enum video_mode *mode);
 
 error_t screen_read_settings(screen_settings_t *settings);
 
+void* get_framebuffer();
+
 #endif //OSDEV_SCREEN_H

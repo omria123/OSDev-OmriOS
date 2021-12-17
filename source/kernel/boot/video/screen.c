@@ -1,3 +1,4 @@
+#define __FILE_ID__ 4
 #include "kernel/video/screen.h"
 
 #include <stddef.h>
@@ -7,6 +8,7 @@
 #include "kernel/multiboot2.h"
 #include "kernel/exceptions.h"
 #include "cond_utils.h"
+#include "stdlib/string.h"
 
 static struct {
     bool is_initialized;
@@ -74,18 +76,17 @@ error_t screen_read(size_t row, size_t col, void *buf, size_t size) {
 error_t screen_write(size_t row, size_t col, void *buf, size_t size) {
     error_t err = SUCCESS;
     bool valid = true;
+    size_t i = 0;
     CHECK_CODE(g_state.is_initialized, ERROR_UNINITIALIZED);
     CHECK(IN_RANGE(0, row, g_state.height));
     CHECK(IN_RANGE(0, col, g_state.width));
     CHECK_AND_RETHROW(screen_is_valid_access(row, col, size, &valid));
     CHECK(valid);
     CHECK(buf);
-
-
+    memcpy(g_state.framebuffer + row * g_state.pitch + col, buf, size);
     cleanup:
     return err;
 }
-
 
 error_t screen_initalize(uint32_t multiboot_header) {
     error_t err = SUCCESS;
@@ -98,7 +99,7 @@ error_t screen_initalize(uint32_t multiboot_header) {
     CHECK(framebuffer_info->common.type == MULTIBOOT_TAG_TYPE_FRAMEBUFFER);
     framebuffer_common_info = &framebuffer_info->common;
 
-    g_state.framebuffer = (void *) framebuffer_common_info->framebuffer_addr;
+    g_state.framebuffer = (void *) (uint32_t) framebuffer_common_info->framebuffer_addr;
     g_state.height = framebuffer_common_info->framebuffer_height;
     g_state.width = framebuffer_common_info->framebuffer_width;
     g_state.mode = framebuffer_common_info->framebuffer_type;
@@ -108,4 +109,7 @@ error_t screen_initalize(uint32_t multiboot_header) {
 
     cleanup:
     return err;
+}
+void* get_framebuffer() {
+    return g_state.framebuffer;
 }

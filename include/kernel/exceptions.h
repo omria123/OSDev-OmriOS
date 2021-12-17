@@ -5,28 +5,34 @@
 #ifndef OSDEV_EXCEPTIONS_H
 #define OSDEV_EXCEPTIONS_H
 
-typedef int error_t;
 enum error {
-    SUCCESS = 0,
+    ERROR_SUCCESS = 0,
     ERROR_INVALID = 1,
     ERROR_NULL_DEREF = 2,
     ERROR_UNINITIALIZED = 3,
     ERROR_NOT_IMPLEMENTED = 4,
 };
 
+typedef struct {
+    enum error code_num;
+    int line;
+    int file_id;
+} error_t;
 
 
-#define CHECK_LABEL_CODE(expr, label, code)  do { if (!(expr)) { err = (code); goto label; } } while (0)
+#define SUCCESS {ERROR_SUCCESS, __LINE__ ,__FILE_ID__};
+
+#define CHECK_LABEL_CODE(expr, label, code)  do { if (!(expr)) { err.code_num = code; err.line = __LINE__; err.file_id = __FILE_ID__; goto label; } } while (0)
 #define CHECK_LABEL(expr, label) CHECK_LABEL_CODE(expr, label, ERORR_INVALID)
 #define CHECK_CODE(expr, code) CHECK_LABEL_CODE(expr, cleanup, code)
 
 #define CHECK(expr) CHECK_CODE(expr, ERROR_INVALID)
 
-#define IS_SUCCESS(expr) ((expr) == SUCCESS)
+#define IS_SUCCESS(expr) (((expr).code_num) == ERROR_SUCCESS)
 #define IS_FAILED(expr) (!IS_SUCCESS(expr))
 
 
-#define CHECK_AND_RETHROW_LABEL(error, label) do {err = error; CHECK_LABEL_CODE(IS_SUCCESS(err), label, err);} while(0)
+#define CHECK_AND_RETHROW_LABEL(error, label) do {if (IS_FAILED(error)) {err = error; goto cleanup;}} while(0)
 #define CHECK_AND_RETHROW(error) CHECK_AND_RETHROW_LABEL(error, cleanup)
 
 

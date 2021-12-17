@@ -1,3 +1,4 @@
+#define __FILE_ID__ 3
 #include "kernel/video/terminal.h"
 
 #include <stdbool.h>
@@ -39,7 +40,7 @@ static error_t terminal_roll() {
     CHECK_CODE(g_state.is_initialized, ERROR_UNINITIALIZED);
     g_state.row = 0;
     g_state.colum = 0;
-cleanup:
+    cleanup:
     return err;
 
 }
@@ -75,6 +76,7 @@ static error_t terminal_putchar__impl(char c) {
     return err;
 
 }
+
 // Put a char into the terminal
 error_t terminal_putchar(char c) {
     error_t err = SUCCESS;
@@ -88,24 +90,18 @@ error_t terminal_putchar(char c) {
 error_t terminal_reset() {
     error_t err = SUCCESS;
     enum video_mode mode = 0;
-    screen_settings_t settings = {0};
-    uint32_t i = 0;
-    uint32_t j = 0;
-    uint32_t rows = 0;
-    uint32_t cols = 0;
     CHECK_CODE(g_state.is_initialized || g_state.is_initializing, ERROR_UNINITIALIZED);
     CHECK_AND_RETHROW(screen_mode(&mode));
-    CHECK_AND_RETHROW(screen_read_settings(&settings));
-    CHECK_AND_RETHROW(terminal_set_pos(0, 0));
-    rows = settings.height / g_state.char_settings.height;
-    cols = settings.width / g_state.char_settings.width;
-    for (i = 0; i < rows; i++) {
-        for (j = 0; j < cols; j ++) {
-            CHECK_AND_RETHROW(terminal_putchar__impl(' '));
-        }
+    switch (mode) {
+        case EGA:
+            CHECK_AND_RETHROW(vga_fill_screen(g_state.color));
+            break;
+        default:
+            CHECK_FAILED_CODE(ERROR_NOT_IMPLEMENTED);
     }
+
     CHECK_AND_RETHROW(terminal_set_pos(0, 0));
-cleanup:
+    cleanup:
     return err;
 }
 
@@ -150,7 +146,6 @@ error_t terminal_write_cstring(const char *string) {
     CHECK_CODE(g_state.is_initialized, ERROR_UNINITIALIZED);
     CHECK(string);
     CHECK_AND_RETHROW(terminal_write(string, strlen(string)));
-    CHECK_AND_RETHROW(terminal_reset());
     cleanup:
     return err;
 }
@@ -173,19 +168,22 @@ error_t terminal_initalize(uint32_t multiboot2_header) {
     g_state.row = 0;
     g_state.colum = 0;
     g_state.is_initializing = 1;
-    g_state.color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
     CHECK_AND_RETHROW(screen_mode(&g_state.mode));
-    switch(g_state.mode) {
+    switch (g_state.mode) {
         case IND:
             memcpy(&g_state.char_settings, &ind_char_settings, sizeof g_state.char_settings);
+            CHECK_FAILED_CODE(ERROR_NOT_IMPLEMENTED);
             break;
         case EGA:
+            g_state.color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
             memcpy(&g_state.char_settings, &vga_char_settings, sizeof g_state.char_settings);
             break;
         case RGB:
             memcpy(&g_state.char_settings, &rgb_char_settings, sizeof g_state.char_settings);
+            CHECK_FAILED_CODE(ERROR_NOT_IMPLEMENTED);
             break;
     }
+    CHECK_AND_RETHROW(terminal_reset());
     g_state.is_initialized = 1;
     cleanup:
     g_state.is_initializing = 0;

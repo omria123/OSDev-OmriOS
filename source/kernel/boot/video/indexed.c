@@ -1,3 +1,4 @@
+#define __FILE_ID__ 6
 #include "kernel/video/ind.h"
 #include <stdint.h>
 

@@ -1,3 +1,4 @@
+#define __FILE_ID__ 5
 #include "kernel/video/rgb.h"
 
 #include <stdint.h>
@@ -9,6 +10,7 @@
 error_t rgb_putchar(uint32_t row, uint32_t col, uint8_t c, uint8_t color) {
     error_t err = SUCCESS;
     CHECK_FAILED_CODE(ERROR_NOT_IMPLEMENTED);
+
     cleanup:
     return err;
 }

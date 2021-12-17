@@ -33,4 +33,6 @@ error_t vga_putchar(uint32_t row, uint32_t col, char c, uint8_t color);
 
 extern char_settings_t vga_char_settings;
 
+error_t vga_fill_screen(uint8_t color);
+
 #endif //OSDEV_VGA_H

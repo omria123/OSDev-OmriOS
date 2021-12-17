@@ -1,25 +1,17 @@
 default rel
 bits 32
-ALIGNMENT equ (1<<0)
-MEMINFO equ (1<<1)
-KERNEL_ELF_FLAGS equ (ALIGNMENT | MEMINFO)
-MAGIC equ 0x1BADB002
-CHECKSUM equ -(MAGIC) + (KERNEL_ELF_FLAGS)
 MULTIBOOT2_HEADER_MAGIC equ 0xe85250d6
+MULTIBOOT_HEADER_TAG_END equ 0
 GRUB_MULTIBOOT_ARCHITECTURE_I386 equ 0
 
-; Multiboot header containing the magic, flags and checksum.
-section .multiboot align=4
-dd MAGIC
-dd KERNEL_ELF_FLAGS
-dd CHECKSUM
+extern kernel_main
+
 
 ; Define stack as NOBITS to make the kernel executable smaller
 section .bss align=16
 stack_bottom:
 BSS_STACK resb 1<<14
 stack_top:
-
 
 section .text
 global _start:function (multiboot_entry - _start)
@@ -40,15 +32,17 @@ multiboot_header:
     dd GRUB_MULTIBOOT_ARCHITECTURE_I386
     dd multiboot_header_end - multiboot_header
     dd -(MULTIBOOT2_HEADER_MAGIC + GRUB_MULTIBOOT_ARCHITECTURE_I386 + (multiboot_header_end - multiboot_header))
+multiboot_final_tag:
+    dw MULTIBOOT_HEADER_TAG_END
+    dw 0
+    dd 8
 multiboot_header_end:
-
 
 multiboot_entry:
     mov esp, stack_top
     xor edx, edx
     push edx
     popf
-
 
     push ebx
     push eax
@@ -59,5 +53,6 @@ multiboot_entry:
 .HLT:
     hlt
     jmp .HLT
-.END:
-kernel_main:
+.END
+
+
