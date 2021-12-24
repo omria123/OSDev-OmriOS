@@ -12,6 +12,7 @@
 
 
 size_t strlen(const char* str);
+int isspace(char c);
 
 void *
 memcpy(void *dest, const void *src, size_t len);

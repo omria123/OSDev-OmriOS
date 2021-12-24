@@ -15,6 +15,7 @@ error_t terminal_get_color(uint8_t *color);
 error_t terminal_reset(void);
 error_t terminal_putchar(char c);
 
+error_t terminal_get_pos(size_t* row, size_t* col);
 error_t terminal_set_pos(size_t row, size_t col);
 
 #define OSDEV_TERMINAL_H

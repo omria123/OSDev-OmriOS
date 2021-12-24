@@ -5,8 +5,7 @@
 
 size_t strlen(const char *str) {
     size_t len = 0;
-    while (str[len])
-        len++;
+    while (str[++len]);
     return len;
 }
 
@@ -21,3 +20,18 @@ memcpy(void *dest, const void *src, size_t len) {
 }
 
 
+int isspace(char c) {
+    switch (c) {
+        case ' ':
+        case '\t':
+        case '\v':
+        case '\f':
+        case '\r':
+        case '\b':
+        case '\n':
+            break;
+        default:
+            return 0;
+    }
+    return 1;
+}

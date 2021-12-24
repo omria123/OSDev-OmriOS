@@ -16,7 +16,6 @@ error_t vga_putchar(uint32_t row, uint32_t col, char c, uint8_t color) {
     ega_char.c = c;
     ega_char.color = color;
     CHECK_AND_RETHROW(screen_write(row, col * sizeof ega_char, &ega_char, sizeof ega_char));
-
     cleanup:
     return err;
 }

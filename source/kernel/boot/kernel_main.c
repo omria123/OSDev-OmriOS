@@ -9,6 +9,9 @@
 error_t boot_status = SUCCESS;
 enum video_mode mode = -5;
 screen_settings_t settings = {0};
+size_t row = -1;
+size_t col = -1;
+uint8_t color = 0;
 char *fb = NULL;
 
 static error_t initalize_modules(uint32_t multiboot_info) {
@@ -24,10 +27,14 @@ void kernel_main(uint32_t magic, uint32_t multiboot_info) {
     error_t err = SUCCESS;
     CHECK_CODE(magic == MULTIBOOT2_BOOTLOADER_MAGIC, ERROR_NOT_IMPLEMENTED);
     CHECK_AND_RETHROW(initalize_modules(multiboot_info));
-    CHECK_AND_RETHROW(terminal_write_cstring("Hello, kernel World!\n"));
+
+
+    // Add state for debug
     CHECK_AND_RETHROW(screen_mode(&mode));
     memcpy(&boot_status, &err, sizeof(err));
     CHECK_AND_RETHROW(screen_read_settings(&settings));
+    CHECK_AND_RETHROW(terminal_get_pos(&row, &col));
+    CHECK_AND_RETHROW(terminal_get_color(&color));
     fb = get_framebuffer();
     cleanup:
     return;

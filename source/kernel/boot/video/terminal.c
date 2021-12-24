@@ -1,4 +1,5 @@
 #define __FILE_ID__ 3
+
 #include "kernel/video/terminal.h"
 
 #include <stdbool.h>
@@ -18,6 +19,8 @@ static struct {
     uint8_t color;
     enum video_mode mode;
     char_settings_t char_settings;
+    size_t rows;
+    size_t cols;
     bool is_initialized;
     bool is_initializing;
 } g_state;
@@ -29,8 +32,10 @@ static void terminal_advance_pos(char c) {
             g_state.row++;
         case '\r':
             g_state.colum = 0;
+            break;
         default:
             g_state.colum++;
+            break;
     }
 }
 
@@ -51,25 +56,28 @@ static error_t terminal_putchar__impl(char c) {
     bool screen_full = false;
 
     CHECK_AND_RETHROW(screen_mode(&mode));
-
-    switch (mode) {
-        case IND:
-            ind_putchar(g_state.row, g_state.colum, c, g_state.color);
-            break;
-        case RGB:
-            rgb_putchar(g_state.row, g_state.colum, c, g_state.color);
-            break;
-        case EGA:
-            vga_putchar(g_state.row, g_state.colum, c, g_state.color);
-            break;
-        default:
-            CHECK_FAILED();
+    if (!isspace(c) || c == ' ') {
+        switch (mode) {
+            case IND:
+                CHECK_AND_RETHROW(ind_putchar(g_state.row, g_state.colum, c, g_state.color));
+                break;
+            case RGB:
+                CHECK_AND_RETHROW(rgb_putchar(g_state.row, g_state.colum, c, g_state.color));
+                break;
+            case EGA:
+                CHECK_AND_RETHROW(vga_putchar(g_state.row, g_state.colum, c, g_state.color));
+                break;
+            default:
+                CHECK_FAILED();
+        }
     }
     terminal_advance_pos(c);
-
-    CHECK_AND_RETHROW(screen_is_valid_access(g_state.row, g_state.colum, 1, &screen_full));
-    if (screen_full) {
+    if (g_state.row >= g_state.rows) {
         CHECK_AND_RETHROW(terminal_roll());
+    }
+
+    if (g_state.colum >= g_state.cols) {
+        CHECK_AND_RETHROW(terminal_putchar__impl('\n'));
     }
 
     cleanup:
@@ -132,7 +140,7 @@ error_t terminal_set_color(uint8_t color) {
 error_t terminal_write(const char *data, size_t size) {
     error_t err = SUCCESS;
     CHECK_CODE(g_state.is_initialized, ERROR_UNINITIALIZED);
-    CHECK(data);
+    CHECK_CODE(data, ERROR_NULL_DEREF);
 
     for (size_t i = 0; i < size; i++)
         CHECK_AND_RETHROW(terminal_putchar(data[i]));
@@ -160,15 +168,30 @@ error_t terminal_set_pos(const size_t row, const size_t col) {
     return err;
 }
 
+// Get the pos of the terminal
+error_t terminal_get_pos(size_t *row, size_t *col) {
+    error_t err = SUCCESS;
+    CHECK_CODE(g_state.is_initialized || g_state.is_initializing, ERROR_UNINITIALIZED);
+    CHECK_CODE(row, ERROR_NULL_DEREF);
+    CHECK_CODE(col, ERROR_NULL_DEREF);
+
+    *row = g_state.row;
+    *col = g_state.colum;
+    cleanup:
+    return err;
+}
+
 
 // Initalize terminal
 error_t terminal_initalize(uint32_t multiboot2_header) {
     error_t err = SUCCESS;
+    screen_settings_t settings = {0};
     CHECK(!g_state.is_initialized);
     g_state.row = 0;
     g_state.colum = 0;
     g_state.is_initializing = 1;
     CHECK_AND_RETHROW(screen_mode(&g_state.mode));
+    CHECK_AND_RETHROW(screen_read_settings(&settings));
     switch (g_state.mode) {
         case IND:
             memcpy(&g_state.char_settings, &ind_char_settings, sizeof g_state.char_settings);
@@ -183,6 +206,8 @@ error_t terminal_initalize(uint32_t multiboot2_header) {
             CHECK_FAILED_CODE(ERROR_NOT_IMPLEMENTED);
             break;
     }
+    g_state.rows = settings.height / g_state.char_settings.height;
+    g_state.cols = settings.width / g_state.char_settings.width;
     CHECK_AND_RETHROW(terminal_reset());
     g_state.is_initialized = 1;
     cleanup:
