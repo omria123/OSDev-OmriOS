@@ -9,7 +9,7 @@ add_compile_options(
 
 set(KERNEL_ENTRY_SOURCE boot/entry.S)
 set(KERNEL_LINKER_SCRIPT linker.ld)
-set(KERNEL_SOURCES boot/kernel_main.c boot/video/terminal.c boot/video/screen.c boot/memory/kalloc.c boot/multiboot_utils.c boot/video/vga.c boot/video/indexed.c boot/video/rgb.c)
+set(KERNEL_SOURCES boot/kernel_main.c boot/video/terminal.c boot/video/screen.c boot/multiboot_utils.c boot/video/vga.c boot/video/indexed.c boot/video/rgb.c boot/memory/bootmem.c memory/palloc.c memory/kalloc.c)
 set(KERNEL_COMPILE_FLAGS -ffreestanding -O2 -m32)
 set(KERNEL_LINK_FLAGS -nostdlib -m32 -static -T ${KERNEL_LINKER_SCRIPT})
 set(KERNEL_LIBS stdlib_static)

@@ -1,4 +1,4 @@
-#define __FILE_ID__ 7 // LAST_FILE
+#define __FILE_ID__ 7
 #include "kernel/memory/kalloc.h"
 #include "kernel/exceptions.h"
 
