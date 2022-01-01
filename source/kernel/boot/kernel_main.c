@@ -19,7 +19,7 @@ static error_t initalize_boot_modules(uint32_t multiboot_info) {
     error_t err = SUCCESS;
     CHECK_AND_RETHROW(screen_initalize(multiboot_info));
     CHECK_AND_RETHROW(terminal_initalize(multiboot_info));
-    CHECK_AND_RETHROW(bootmem_initalize(multiboot_info));
+    CHECK_AND_RETHROW(bootmem_initialize(multiboot_info));
 cleanup:
     return err;
 }
